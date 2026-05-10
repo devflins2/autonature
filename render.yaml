@@ -1,0 +1,48 @@
+services:
+  # --- BACKEND (SERVER) ---
+  - type: web
+    name: flora-engine
+    env: docker
+    dockerContext: ./server
+    dockerfilePath: ./server/Dockerfile
+    plan: free
+    healthCheckPath: /api/stats/overview
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: MONGO_URI
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: META_ACCESS_TOKEN
+        sync: false
+      - key: INSTAGRAM_BUSINESS_ID
+        sync: false
+      - key: FACEBOOK_PAGE_ID
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: PEXELS_API_KEY
+        sync: false
+      - key: PIXABAY_API_KEY
+        sync: false
+      - key: PUBLIC_URL
+        value: https://flora-engine.onrender.com
+      - key: NODE_ENV
+        value: production
+
+  # --- FRONTEND (CLIENT) ---
+  - type: static
+    name: flora-dashboard
+    env: static
+    buildCommand: npm install && npm run build
+    publishPath: ./client/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://flora-engine.onrender.com/api

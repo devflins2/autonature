@@ -1,0 +1,11 @@
+{
+  "name": "autopost-root",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "npx concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "seed": "npm run dev --prefix server -- src/utils/seedSongs.ts"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
