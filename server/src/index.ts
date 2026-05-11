@@ -16,7 +16,7 @@ import { initScheduler } from './services/schedulerService';
 import { cleanupOldTempFiles } from './services/videoService';
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.HF_SPACE === 'true' ? 7860 : (process.env.PORT || 5000);
 
 // Startup: clean stale temp files from previous runs
 cleanupOldTempFiles();
