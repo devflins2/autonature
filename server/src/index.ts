@@ -53,7 +53,7 @@ app.use('/temp', express.static(path.join(process.cwd(), 'temp')));
 
 // Extra Security Headers
 app.use((req, res, next) => {
-  res.setHeader('X-Frame-Options', 'DENY');
+  // Removed X-Frame-Options DENY to allow embedding on Hugging Face
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   next();
