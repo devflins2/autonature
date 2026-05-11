@@ -350,7 +350,7 @@ export const processVideo = async (
 
   try {
     console.log(`📡 Downloading video: ${videoUrl.substring(0, 60)}...`);
-    const vidOk = await downloadFileStreamed(videoUrl, tempVideoPath, 50);
+    const vidOk = await downloadFileStreamed(videoUrl, tempVideoPath, 200);
     if (!vidOk) throw new Error('Video download failed or too large');
 
     let audioReady = false;
