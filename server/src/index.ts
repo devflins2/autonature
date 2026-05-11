@@ -76,13 +76,35 @@ mongoose.connect(MONGODB_URI)
   .then(() => console.log('✅ Connected to MongoDB Atlas'))
   .catch((err) => console.error('❌ MongoDB connection error:', err));
 
-app.get('/', (req, res) => {
-  res.send('Flora Backend Secure Engine is running!');
-});
+// --- UNIFIED DEPLOYMENT LOGIC (Serve Frontend) ---
+const isProduction = process.env.NODE_ENV === 'production' || process.env.HF_SPACE === 'true';
+
+if (isProduction) {
+  // Hugging Face ya Production mein client/dist ko serve karein
+  const clientPath = path.join(process.cwd(), '../client/dist');
+  app.use(express.static(clientPath));
+
+  app.get('*', (req, res) => {
+    // API routes ko skip karke baki sab frontend pe bhej dein
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(path.join(clientPath, 'index.html'));
+    }
+  });
+} else {
+  app.get('/', (req, res) => {
+    res.send('Flora Backend Secure Engine is running (Development Mode)!');
+  });
+}
 
 app.listen(PORT, () => {
-  console.log(`\n🚀 Flora Engine running!`);
-  console.log(`   API:       http://localhost:${PORT}/api/stats/overview`);
-  console.log(`   Dashboard: http://localhost:5173  <-- (Vite Frontend)`);
-  console.log(`   Temp:      http://localhost:${PORT}/temp\n`);
+  console.log(`\n🚀 Flora Engine running on port ${PORT}!`);
+  if (isProduction) {
+    console.log(`   Mode:      Production (Unified)`);
+    console.log(`   URL:       http://localhost:${PORT}`);
+  } else {
+    console.log(`   Mode:      Development`);
+    console.log(`   API:       http://localhost:${PORT}/api`);
+    console.log(`   Dashboard: http://localhost:5173 (Vite)`);
+  }
 });
+

@@ -4,7 +4,8 @@ import { LayoutDashboard, Image as ImageIcon, Video, Music, Calendar, Settings, 
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Global Axios Config for Flora
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
+
 
 interface MediaItem {
   id: string;
