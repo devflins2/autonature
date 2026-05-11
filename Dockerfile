@@ -1,13 +1,8 @@
 # Base image with Node.js
 FROM node:20-slim AS builder
 
-# Install build essentials and ffmpeg
-RUN apt-get update && apt-get install -y \
-    python3 \
-    make \
-    g++ \
-    ffmpeg \
-    && rm -rf /var/lib/apt/lists/*
+# No additional build tools needed for current dependencies.
+# If you add native modules (like bcrypt or sharp) later, you can add them here.
 
 WORKDIR /app
 
@@ -35,23 +30,29 @@ RUN npm run build
 # --- FINAL STAGE ---
 FROM node:20-slim
 
-# Re-install ffmpeg in final image
-RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
+# Install FFmpeg (runtime only, minimal installation)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+WORKDIR /app/server
 
 # Copy built assets and necessary files from builder
-COPY --from=builder /app/server/dist ./server/dist
-COPY --from=builder /app/server/package*.json ./server/
-COPY --from=builder /app/server/node_modules ./server/node_modules
-COPY --from=builder /app/client/dist ./client/dist
+COPY --from=builder /app/server/dist ./dist
+COPY --from=builder /app/server/package*.json ./
+COPY --from=builder /app/server/node_modules ./node_modules
+COPY --from=builder /app/client/dist /app/client/dist
+
+# Create temp directory for video processing
+RUN mkdir -p temp && chmod 777 temp
 
 # Environment variables
 ENV NODE_ENV=production
 ENV PORT=7860
+ENV HF_SPACE=true
 
 # Port for Hugging Face
 EXPOSE 7860
 
-# Start the server
-CMD ["node", "server/dist/index.js"]
+# Start the server from the server directory
+CMD ["node", "dist/index.js"]

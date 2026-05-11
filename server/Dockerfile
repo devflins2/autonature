@@ -10,8 +10,8 @@ RUN npm run build
 # --- RUNTIME STAGE ---
 FROM node:20-slim
 
-# Install FFmpeg for video processing
-RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
+# Install FFmpeg for video processing (minimal installation)
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
