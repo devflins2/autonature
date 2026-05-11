@@ -172,14 +172,17 @@ function App() {
         fetchLogs();
         fetchStats();
         
-        if (stats.nextRunTime) {
-          const next = new Date(stats.nextRunTime);
-          const now = new Date();
-          const diff = next.getTime() - now.getTime();
+        if (stats.nextRunTime && (stats as any).serverTime) {
+          const next = new Date(stats.nextRunTime).getTime();
+          const serverNow = (stats as any).serverTime;
           
-          if (diff > 0) {
-            const mins = Math.floor(diff / 60000);
-            const secs = Math.floor((diff % 60000) / 1000);
+          // Calculate how many ms are left according to the server
+          const msLeft = next - serverNow;
+          
+          // Apply that remaining time to our local countdown
+          if (msLeft > 0) {
+            const mins = Math.floor(msLeft / 60000);
+            const secs = Math.floor((msLeft % 60000) / 1000);
             setNextPostTime(`${mins}m ${secs}s`);
           } else {
             setNextPostTime('Processing...');

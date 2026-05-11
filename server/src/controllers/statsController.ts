@@ -39,6 +39,7 @@ export const getDashboardStats = async (req: Request, res: Response) => {
       totalViews, 
       totalLikes, 
       nextRunTime: getNextRunTime(),
+      serverTime: Date.now(),
       recentPosts: postsWithInsights 
     });
   } catch (error: any) {

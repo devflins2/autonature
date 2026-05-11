@@ -12,7 +12,13 @@ import { fetchOneVideoFromCloudinary, fetchOneImageFromCloudinary, deleteMediaFr
 let isAutoPilotRunning = false;
 let nextRunTime: Date | null = null;
 
-export const getNextRunTime = () => nextRunTime;
+export const getNextRunTime = () => {
+  if (nextRunTime && nextRunTime.getTime() > Date.now()) return nextRunTime;
+  // If null or past, predict next hour's start
+  const next = new Date();
+  next.setHours(next.getHours() + 1, 0, 0, 0);
+  return next;
+};
 
 // ─── AUTO-RETRY HELPER ───────────────────────────────────────────────────────
 // Retries an async function up to `maxAttempts` times with exponential backoff.
@@ -255,7 +261,7 @@ export const initScheduler = () => {
   cron.schedule('0 * * * *', async () => {
     const delayMs = Math.floor(Math.random() * 15 * 60 * 1000);
     nextRunTime = new Date(Date.now() + delayMs);
-    console.log(`🎲 Auto-Pilot scheduled for: ${nextRunTime.toLocaleTimeString('en-IN')}`);
+    console.log(`🎲 Auto-Pilot scheduled for: ${nextRunTime.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })}`);
     setTimeout(() => runAutoPilot(), delayMs);
   });
 };
