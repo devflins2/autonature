@@ -401,7 +401,12 @@ export const processVideo = async (
           '-r 30'
         ])
         .on('start', () => console.log('🎬 [VideoReel] FFmpeg started.'))
-        .on('progress', (p) => console.log(`⏳ Encoding: ${p.percent?.toFixed(1) ?? '?'}%`))
+        .on('progress', (p) => {
+          const percent = Math.floor(p.percent || 0);
+          if (percent % 10 === 0 && percent > 0) {
+            console.log(`⏳ Encoding: ${percent}%`);
+          }
+        })
         .on('end', () => { cleanup(); resolve(outputPath); })
         .on('error', (err) => { cleanup(); reject(err); })
         .save(outputPath);
