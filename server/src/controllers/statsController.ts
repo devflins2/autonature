@@ -9,9 +9,15 @@ export const getDashboardStats = async (req: Request, res: Response) => {
       .sort({ postedAt: -1 })
       .limit(10);
 
-    // Fetch live insights for the most recent 5 posts
-    const postsWithInsights = await Promise.all(recentPosts.map(async (post) => {
-      if (post.igMediaId) {
+    // Fetch live insights for the most recent 5 posts (only if older than 6 hours)
+    const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
+    
+    const postsWithInsights = await Promise.all(recentPosts.slice(0, 5).map(async (post) => {
+      // Only fetch if we have an ID AND (no insights yet OR insights are older than 6 hours)
+      const needsUpdate = !post.insights || (post as any).updatedAt < sixHoursAgo;
+
+      if (post.igMediaId && needsUpdate) {
+        console.log(`📊 Refreshing insights for post: ${post.igMediaId}`);
         const liveInsights = await getMediaInsights(post.igMediaId);
         post.insights = liveInsights;
         await post.save();

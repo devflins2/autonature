@@ -27,6 +27,13 @@ const withRetry = async <T>(fn: () => Promise<T>, maxAttempts: number = 3, label
     try {
       return await fn();
     } catch (error: any) {
+      // If it's a rate limit error, don't waste more calls on retries immediately
+      const errorMsg = error.message.toLowerCase();
+      if (errorMsg.includes('too many calls') || errorMsg.includes('80002') || errorMsg.includes('rate limit')) {
+        console.warn(`🛑 [${label}] Rate limit detected. Skipping further retries for this cycle.`);
+        throw error;
+      }
+
       if (attempt === maxAttempts) {
         console.error(`❌ [${label}] All ${maxAttempts} attempts failed.`);
         throw error;
@@ -236,6 +243,11 @@ export const initScheduler = () => {
   const nextHour = new Date();
   nextHour.setHours(nextHour.getHours() + 1, 0, 0, 0);
   nextRunTime = nextHour;
+
+  console.log(`\n${'═'.repeat(40)}`);
+  console.log(`📡 Flora is in WATCH MODE.`);
+  console.log(`⏰ Next autonomous post at: ${nextRunTime.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })}`);
+  console.log(`${'═'.repeat(40)}\n`);
 
   // runAutoPilot().catch(err => console.error('Initial Auto-Pilot failed:', err));
 

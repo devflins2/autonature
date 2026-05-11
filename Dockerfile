@@ -50,6 +50,8 @@ RUN mkdir -p temp && chmod 777 temp
 ENV NODE_ENV=production
 ENV PORT=7860
 ENV HF_SPACE=true
+ENV TZ=Asia/Kolkata
+EXPOSE 7860
 
 # Port for Hugging Face
 EXPOSE 7860

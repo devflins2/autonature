@@ -84,7 +84,24 @@ export const postToInstagramReel = async (videoUrl: string, caption: string) => 
 
     return publishRes.data;
   } catch (error: any) {
-    const errorData = error.response?.data?.error?.message || error.message;
+    const headers = error.response?.headers;
+    const rateLimitInfo = headers?.['x-business-use-case-usage'] || headers?.['x-app-usage'];
+    
+    let errorData = error.response?.data?.error?.message || error.message;
+    
+    if (rateLimitInfo) {
+      console.warn('📊 Meta Rate Limit Info:', rateLimitInfo);
+      // Try to parse estimated time to regain access if it exists
+      try {
+        const usage = JSON.parse(rateLimitInfo);
+        const accountId = Object.keys(usage)[0];
+        const estimatedWait = usage[accountId]?.[0]?.estimated_time_to_regain_access;
+        if (estimatedWait > 0) {
+          errorData += ` (Estimated wait: ${estimatedWait} minutes)`;
+        }
+      } catch (e) {}
+    }
+
     console.error('❌ Instagram Reel Error:', errorData);
     throw new Error(errorData);
   }
