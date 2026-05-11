@@ -375,10 +375,8 @@ export const processVideo = async (
 
       cmd
         .videoFilters([
-          { filter: 'scale', options: 'w=bitand(min(1080,iw),-2):h=bitand(min(1920,ih),-2)' }, // Force even resolution
-          { filter: 'setsar', options: '1' },
-          { filter: 'unsharp', options: '3:3:0.8:3:3:0.0' },
-          { filter: 'eq',    options: `brightness=${brightness}:contrast=${contrast}:saturation=${saturation}` }
+          { filter: 'scale', options: 'w=trunc(min(iw,1080)/2)*2:h=-2' }, // Safe scale, keeps ratio
+          { filter: 'setsar', options: '1' }
         ])
         .videoCodec('libx264')
         .audioCodec('aac')
