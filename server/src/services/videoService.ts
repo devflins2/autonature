@@ -374,14 +374,11 @@ export const processVideo = async (
       const saturation = (1 + Math.random() * 0.1  - 0.05).toFixed(2);
 
       cmd
-        .videoFilters([
-          { filter: 'scale', options: 'w=trunc(min(iw,1080)/2)*2:h=-2' }, // Safe scale, keeps ratio
-          { filter: 'setsar', options: '1' }
-        ])
         .videoCodec('libx264')
         .audioCodec('aac')
         .audioBitrate('128k')
         .outputOptions([
+          '-vf', 'format=yuv420p', // Ensure standard pixel format without resizing/cropping
           ...(audioReady
             ? ['-map 0:v:0', '-map 1:a:0', '-shortest']
             : ['-map 0:v:0', '-map 0:a:0?']
