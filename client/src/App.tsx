@@ -188,8 +188,7 @@ function App() {
             setNextPostTime('Processing...');
           }
         } else {
-          const now = new Date();
-          setNextPostTime(`${59 - now.getMinutes()}m ${59 - now.getSeconds()}s`);
+          setNextPostTime('Syncing...');
         }
       }, 1000);
 

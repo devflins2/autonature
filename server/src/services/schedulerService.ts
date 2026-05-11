@@ -232,9 +232,12 @@ ${'═'.repeat(50)}
 export const initScheduler = () => {
   console.log('⏰ Scheduler Initialized: Running every hour...');
 
-  // Run once immediately on startup
-  nextRunTime = new Date(); // Right now
-  runAutoPilot().catch(err => console.error('Initial Auto-Pilot failed:', err));
+  // Initialize nextRunTime to next hour start on startup
+  const nextHour = new Date();
+  nextHour.setHours(nextHour.getHours() + 1, 0, 0, 0);
+  nextRunTime = nextHour;
+
+  // runAutoPilot().catch(err => console.error('Initial Auto-Pilot failed:', err));
 
   // Every Minute: Fire manual scheduled posts
   cron.schedule('* * * * *', async () => {
