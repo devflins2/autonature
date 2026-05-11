@@ -375,10 +375,9 @@ export const processVideo = async (
 
       cmd
         .videoFilters([
-          { filter: 'scale', options: '1080:1920:force_original_aspect_ratio=increase' },
-          { filter: 'crop',  options: '1080:1920' },
+          { filter: 'scale', options: 'w=min(1080,iw):h=-2' }, // Preserve ratio, max 1080p width
           { filter: 'setsar', options: '1' },
-          { filter: 'unsharp', options: '3:3:0.8:3:3:0.0' }, // Subtle sharpening
+          { filter: 'unsharp', options: '3:3:0.8:3:3:0.0' },
           { filter: 'eq',    options: `brightness=${brightness}:contrast=${contrast}:saturation=${saturation}` }
         ])
         .videoCodec('libx264')
@@ -386,14 +385,14 @@ export const processVideo = async (
         .audioBitrate('128k')
         .outputOptions([
           ...(audioReady
-            ? ['-map 0:v:0', '-map 1:a:0', '-shortest'] // trims longer of video/audio
-            : ['-map 0:v:0', '-map 0:a:0?']              // keep original audio, no trim
+            ? ['-map 0:v:0', '-map 1:a:0', '-shortest']
+            : ['-map 0:v:0', '-map 0:a:0?']
           ),
           '-preset medium',
           '-profile:v high',
           '-level 4.1',
           '-pix_fmt yuv420p',
-          '-crf 20',            // Balanced high quality
+          '-crf 20',
           '-maxrate 8M',
           '-bufsize 16M',
           '-movflags +faststart',
@@ -403,7 +402,7 @@ export const processVideo = async (
         .on('start', () => console.log('🎬 [VideoReel] FFmpeg started.'))
         .on('progress', (p) => {
           const percent = Math.floor(p.percent || 0);
-          if (percent % 10 === 0 && percent > 0) {
+          if (percent % 20 === 0 && percent > 0) {
             console.log(`⏳ Encoding: ${percent}%`);
           }
         })

@@ -87,14 +87,24 @@ export const fetchOneImageFromCloudinary = () => fetchOneFromCloudinary('image')
 export const deleteMediaFromCloudinary = async (publicId: string, type: 'video' | 'image') => {
   if (!cloudName || !apiKey || !apiSecret) return false;
   try {
-    const auth = Buffer.from(`${apiKey}:${apiSecret}`).toString('base64');
+    const crypto = await import('crypto');
+    const timestamp = Math.round(Date.now() / 1000);
+    const signature = crypto.createHash('sha1')
+      .update(`public_id=${publicId}&timestamp=${timestamp}${apiSecret}`)
+      .digest('hex');
+
     await axios.post(
       `https://api.cloudinary.com/v1_1/${cloudName}/${type}/destroy`,
-      { public_id: publicId },
-      { headers: { Authorization: `Basic ${auth}` } }
+      {
+        public_id: publicId,
+        api_key: apiKey,
+        timestamp: timestamp,
+        signature: signature
+      }
     );
     return true;
   } catch (error: any) {
+    console.error(`❌ Cloudinary Delete Error [${publicId}]:`, error.response?.data || error.message);
     return false;
   }
 };
