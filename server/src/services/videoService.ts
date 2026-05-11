@@ -375,7 +375,7 @@ export const processVideo = async (
 
       cmd
         .videoFilters([
-          { filter: 'scale', options: 'w=min(1080,iw):h=-2' }, // Preserve ratio, max 1080p width
+          { filter: 'scale', options: 'w=bitand(min(1080,iw),-2):h=bitand(min(1920,ih),-2)' }, // Force even resolution
           { filter: 'setsar', options: '1' },
           { filter: 'unsharp', options: '3:3:0.8:3:3:0.0' },
           { filter: 'eq',    options: `brightness=${brightness}:contrast=${contrast}:saturation=${saturation}` }
