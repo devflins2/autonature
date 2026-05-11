@@ -387,9 +387,9 @@ export const processVideo = async (
           '-profile:v high',
           '-level 4.1',
           '-pix_fmt yuv420p',
-          '-crf 20',
-          '-maxrate 8M',
-          '-bufsize 16M',
+          '-crf 18',            // Ultra High Quality (Visually Lossless)
+          '-maxrate 12M',
+          '-bufsize 24M',
           '-movflags +faststart',
           '-threads 2',
           '-r 30'
